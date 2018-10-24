@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+
+
+<configuration>
+
+    <typeAliases>
+        <package name="com.tang.pojo"></package>
+    </typeAliases>
+
+
+    <!-- 运行环境配置 -->
+    <!-- default属性：指定使用哪一个运行环境配置 -->
+    <environments default="development">
+        <!-- 配置运行环境，id属性唯一标识 -->
+        <environment id="development">
+            <!-- 配置事务管理器，JDBC：默认使用jdbc事务 -->
+            <transactionManager type="JDBC" />
+            <!-- 数据源配置，POOLED:mybatis提供的内置连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://127.0.0.1:3306/mybatis" />
+                <property name="username" value="root" />
+                <property name="password" value="letmein" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <package name="com.tang.mapper"></package>
+    </mappers>
+</configuration>

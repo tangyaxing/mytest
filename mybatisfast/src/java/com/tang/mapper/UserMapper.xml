@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tang.mapper.UserMapper">
+
+    <select id="selectUserById" resultType="user" parameterType="int">
+        SELECT * FROM USER WHERE id = #{id}
+
+    </select>
+
+    <insert id="addUser" parameterType="user" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO user(username,birthday,sex,address) VALUES(#{username},#{birthday},#{sex},#{address});
+    </insert>
+
+    <select id="selectUserByCondition" parameterType="queryVo" resultType="user">
+        select * from `user` where username like '%${user.username}%'
+    </select>
+
+    <select id="selectUserByUsernameAndSex" parameterType="user" resultType="user">
+        SELECT * FROM USER
+        <where>
+            <if test="username != null and username != ''">
+                username like '%${username}%'
+            </if>
+            <if test="sex != null and sex != ''">
+                and sex = #{sex}
+            </if>
+        </where>
+    </select>
+
+    <update id="dynamicUpdateUserById" parameterType="user">
+        UPDATE user
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="sex != null and sex != ''">
+                sex = #{sex},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <insert id="batchInsertUser" parameterType="list">
+        INSERT INTO user(username,birthday,sex,address)
+        VALUES
+        <foreach collection="list" item="u" separator=",">
+            (#{u.username},#{u.birthday},#{u.sex},#{u.address})
+        </foreach>
+    </insert>
+
+    <delete id="batchDeleteUser" parameterType="list">
+        DELETE FROM user
+        WHERE
+        <foreach collection="array" open="id in(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <resultMap id="ordersAndUserResultMap" type="order">
+        <id column="id" property="id"></id>
+        <result column="createtime" property="createtime"></result>
+        <result column="note" property="note"></result>
+        <result column="number" property="number"></result>
+        <result column="user_id" property="userId"></result>
+
+        <association property="user" javaType="User" >
+            <id column="user_id" property="id"></id>
+            <result column="username" property="username"></result>
+            <result column="address" property="address"></result>
+
+        </association>
+    </resultMap>
+
+    <select id="selectAllOrderAndUser" resultMap="ordersAndUserResultMap">
+        SELECT
+            o.createtime,
+            o.id,
+            o.note,
+            o.number,
+            o.user_id,
+            u.username,
+            u.address
+        FROM
+            orders o
+        LEFT JOIN `user` u ON o.user_id = u.id
+    </select>
+
+    <resultMap id="UserAndOrderResultMap" type="user">
+        <id column="id" property="id" ></id>
+        <result column="username" property="username"></result>
+        <result column="birthday" property="birthday"></result>
+        <result column="sex" property="sex"></result>
+        <result column="address" property="address"></result>
+
+        <collection property="orderList" javaType="List" ofType="order" >
+            <id column="oid" property="id"></id>
+            <result column="createtime" property="createtime"></result>
+            <result column="number" property="number"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectAllUserAndOrder" resultMap="UserAndOrderResultMap">
+        SELECT
+            u.id,
+            u.username,
+            u.birthday,
+            u.sex,
+            u.address,
+            o.id oid,
+            o.createtime,
+            o.number
+        FROM
+            USER u
+        LEFT JOIN orders o ON o.user_id = u.id
+    </select>
+
+</mapper>
